@@ -9,6 +9,7 @@ function Devoloper() {
   const router = useRouter();
   const developerId = Number(router.query.developerId) ;
   const item= details.find(dev => dev.id === developerId);
+  console.log(item);  
  
 if(!item) return <h2>Developer not found..</h2>
 
