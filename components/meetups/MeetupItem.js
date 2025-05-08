@@ -1,8 +1,14 @@
 import Card from '../ui/Card';
 import classes from './MeetupItem.module.css';
-import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 function MeetupItem(props) {
+const router = useRouter();
+
+function handleRedirect (){
+  router.push('/'+props.id);
+}
+
   return (
     <li className={classes.item}>
       <Card>
@@ -14,7 +20,7 @@ function MeetupItem(props) {
           <address>{props.address}</address>
         </div>
         <div className={classes.actions}>
-          <button><Link href={`/${props.id}`}>Show Details</Link></button>
+          <button onClick={handleRedirect}>Show Details</button>
         </div>
       </Card>
     </li>
