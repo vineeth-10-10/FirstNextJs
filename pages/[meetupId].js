@@ -1,4 +1,4 @@
-import {MongoClient} from 'mongodb';
+import {MongoClient, ObjectId} from 'mongodb';
 
 import MeetUpDetails from "@/components/meetups/MeetUpDetails";
 
@@ -16,25 +16,19 @@ export default function DetailsPage(props) {
 
 
 export async function getStaticPaths(){
+    const client = await MongoClient.connect(
+        "mongodb+srv://admin:oYkZrwsZqlZWUoBu@cluster0.ajzk4bz.mongodb.net/meetups?retryWrites=true&w=majority&appName=Cluster0"
+      );
+      const db = client.db();
+      const meetupCollection = db.collection('meetups');
+
+      const meetups = await meetupCollection.find({}, {_id: 1}).toArray();
+
+      client.close();
+
     return{
         fallback:true,
-        paths:[
-            {
-                params:{
-                    meetupId:"m1"
-                }
-            },
-            {
-                params:{
-                    meetupId:"m2"
-                }
-            },
-            {
-                params:{
-                    meetupId:"m3"
-                }
-            }
-        ]
+        paths:meetups.map(maatup => ({params:{meetupId: maatup._id.toString()}}))
     }
 }
 
@@ -48,11 +42,9 @@ export async function getStaticProps(context){
       const db = client.db();
       const meetupCollection = db.collection('meetups');
 
-      const meetups = await meetupCollection.find().toArray();
 
-      const currentMeetup = meetups.find((meetup)=>meetup._id.toString() === meetupId);
+      const currentMeetup =await  meetupCollection.findOne({_id: new ObjectId(meetupId)})
 
-      console.log(currentMeetup);
 
       client.close();
 
@@ -60,7 +52,7 @@ export async function getStaticProps(context){
         props:{
             meetupData:{
                 image:currentMeetup.image,
-                id:meetupId,
+                id:currentMeetup._id.toString(),
                 title:currentMeetup.title,
                 address:currentMeetup.address,
                 description:currentMeetup.description,
